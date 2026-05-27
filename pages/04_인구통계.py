@@ -5,13 +5,16 @@ import matplotlib.font_manager as fm
 import urllib.request
 import os
 
-# --- 1. 스트림릿 클라우드 한글 폰트 설정 (에러 수정 반영) ---
+# --- 1. 스트림릿 클라우드 한글 폰트 설정 ---
 @st.cache_data
 def load_korean_font():
-    font_url = "https://github.com/google/fonts/raw/main/ofl/nanumgothic/NanumGothic-Regular.ttf"
-    font_path = "NanumGothic-Regular.ttf"
+    # 현재 스크립트 파일이 있는 폴더 경로를 기준으로 설정
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    font_path = os.path.join(current_dir, "NanumGothic-Regular.ttf")
     
-    # 폰트 파일이 없으면 다운로드
+    font_url = "https://github.com/google/fonts/raw/main/ofl/nanumgothic/NanumGothic-Regular.ttf"
+    
+    # 폰트 파일이 없으면 해당 폴더에 다운로드
     if not os.path.exists(font_path):
         urllib.request.urlretrieve(font_url, font_path)
     
@@ -24,17 +27,26 @@ def load_korean_font():
 # 폰트 로드 실행
 load_korean_font()
 
-# --- 2. 데이터 로드 및 전처리 ---
+# --- 2. 데이터 로드 및 경로 보안 ---
 @st.cache_data
 def load_data():
-    # 동일 폴더 혹은 상위 구조에 맞게 population.csv 로드
-    df = pd.read_csv("population.csv", encoding="utf-8")
+    # [핵심 수정] 현재 파이썬 파일이 실행되는 절대 경로를 구한 뒤, 그 옆에 있는 파일을 찾습니다.
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(current_dir, "population.csv")
+    
+    # 혹시 상위 폴더(루트)에 있을 경우를 대비한 2차 탐색
+    if not os.path.exists(file_path):
+        parent_dir = os.path.dirname(current_dir)
+        file_path = os.path.join(parent_dir, "population.csv")
+        
+    df = pd.read_csv(file_path, encoding="utf-8")
     return df
 
 try:
     df = load_data()
 except Exception as e:
-    st.error("`population.csv` 파일을 찾을 수 없거나 불러오는데 실패했습니다. 파일 위치를 확인해주세요.")
+    st.error(f"⚠️ 파일 로드 실패! 에러 메시지: {e}")
+    st.info("💡 깃허브 저장소에 'population.csv' 파일이 이 파이썬 파일과 같은 폴더에 있는지 다시 한번 확인해 주세요.")
     st.stop()
 
 # --- 3. UI 구성 및 데이터 필터링 ---
