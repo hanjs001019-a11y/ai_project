@@ -1,4 +1,5 @@
-import streamlit as st
+
+\import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
@@ -8,45 +9,49 @@ import os
 # --- 1. 스트림릿 클라우드 한글 폰트 설정 ---
 @st.cache_data
 def load_korean_font():
-    # 현재 스크립트 파일이 있는 폴더 경로를 기준으로 설정
     current_dir = os.path.dirname(os.path.abspath(__file__))
     font_path = os.path.join(current_dir, "NanumGothic-Regular.ttf")
-    
     font_url = "https://github.com/google/fonts/raw/main/ofl/nanumgothic/NanumGothic-Regular.ttf"
     
-    # 폰트 파일이 없으면 해당 폴더에 다운로드
     if not os.path.exists(font_path):
         urllib.request.urlretrieve(font_url, font_path)
     
-    # 최신 Matplotlib 공식 메서드로 폰트 등록
     fm.fontManager.addfont(font_path)
     prop = fm.FontProperties(fname=font_path)
     plt.rcParams['font.family'] = prop.get_name()
-    plt.rcParams['axes.unicode_minus'] = False # 마이너스 기호 깨짐 방지
+    plt.rcParams['axes.unicode_minus'] = False
 
 # 폰트 로드 실행
 load_korean_font()
 
-# --- 2. 데이터 로드 및 경로 보안 ---
+# --- 2. [강력화된] 전체 프로젝트 내 파일 자동 탐색 로직 ---
 @st.cache_data
-def load_data():
-    # [핵심 수정] 현재 파이썬 파일이 실행되는 절대 경로를 구한 뒤, 그 옆에 있는 파일을 찾습니다.
+def find_and_load_data(target_filename="population.csv"):
+    # 1단계: 현재 파일 위치 기준 탐색
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(current_dir, "population.csv")
     
-    # 혹시 상위 폴더(루트)에 있을 경우를 대비한 2차 탐색
-    if not os.path.exists(file_path):
-        parent_dir = os.path.dirname(current_dir)
-        file_path = os.path.join(parent_dir, "population.csv")
-        
-    df = pd.read_csv(file_path, encoding="utf-8")
-    return df
+    # 2단계: 최상위 프로젝트 폴더(작업 디렉토리) 기준으로 확장 탐색
+    # 스트림릿 클라우드의 기본 배포 루트인 /mount/src/ 안의 모든 곳을 뒤집니다.
+    search_root = "/mount/src" if os.path.exists("/mount/src") else current_dir
+    
+    for root, dirs, files in os.walk(search_root):
+        if target_filename in files:
+            full_path = os.path.join(root, target_filename)
+            # 파일을 찾으면 즉시 데이터프레임으로 로드 후 반환
+            df = pd.read_csv(full_path, encoding="utf-8")
+            return df, full_path
+
+    # 만약 위의 자동 탐색으로도 못 찾았다면 3단계 기본 로드 시도
+    df = pd.read_csv(target_filename, encoding="utf-8")
+    return df, target_filename
 
 try:
-    df = load_data()
+    df, absolute_path = find_and_load_data()
+    # 파일이 어디서 발견되었는지 관리자 메시지 형태로 출력 (성공 확인용)
+    st.success(f"✅ 파일을 성공적으로 찾았습니다! (위치: {absolute_path})")
 except Exception as e:
-    st.error(f"⚠️ 파일 로드 실패! 에러 메시지: {e}")
-    st.info("💡 깃허브 저장소에 'population.csv' 파일이 이 파이썬 파일과 같은 폴더에 있는지 다시 한번 확인해 주세요.")
+    st.error(f"⚠️ 시스템 전체에서 'population.csv' 파일을 검색했으나 찾지 못했습니다.")
+    st.info("💡 깃허브(GitHub) 저장소에 올리신 파일명이 정확히 소문자 `population.csv` 인지 다시 한 번 확인해 주세요. 대소문자가 다르면 리눅스 서버에서 인식하지 못할 수 있습니다.")
     st.stop()
 
 # --- 3. UI 구성 및 데이터 필터링 ---
@@ -60,53 +65,46 @@ selected_region = st.selectbox("분석할 행정구역을 선택하세요:", reg
 # 선택된 행정구역 데이터 필터링
 region_data = df[df['행정구역'] == selected_region].iloc[0]
 
-# '0세'부터 단일 연령 컬럼만 추출 (총인구수, 연령구간인구수 제외)
+# '0세'부터 단일 연령 컬럼만 추출
 age_columns = [col for col in df.columns if '거주자_' in col and '총인구수' not in col and '연령구간인구수' not in col]
 
 age_labels = []
 age_values = []
 
 for col in age_columns:
-    # 컬럼명에서 나이 숫자 추출 (예: '2026년04월_거주자_0세' -> '0')
     age_str = col.split('_')[-1].replace('세', '')
     
     if '이상' in age_str:
-        age_num = 100  # 100세 이상은 100으로 통일
+        age_num = 100
     else:
         age_num = int(age_str)
         
-    # 데이터 값 추출 및 콤마(,) 제거 후 정수 변환
     val_raw = str(region_data[col]).replace(',', '').strip()
     age_num_val = int(val_raw) if val_raw.isdigit() else 0
     
     age_labels.append(age_num)
     age_values.append(age_num_val)
 
-# 시각화를 위한 데이터프레임 빌드 및 나이순 정렬
+# 데이터프레임 빌드 및 정렬
 plot_df = pd.DataFrame({'나이': age_labels, '인구수': age_values})
 plot_df = plot_df.sort_values('나이').reset_index(drop=True)
 
 # --- 4. 무지개색 꺾은선 그래프 시각화 ---
 fig, ax = plt.subplots(figsize=(12, 6))
-
 num_points = len(plot_df)
-cmap = plt.get_cmap('jet') # 화려한 무지개 패턴을 표현하는 컬러맵
+cmap = plt.get_cmap('jet')
 
-# 1살 구간마다 색상을 다르게 주어 연결 (무지개 효과)
 for i in range(num_points - 1):
     color = cmap(i / num_points)
     ax.plot(plot_df['나이'].iloc[i:i+2], plot_df['인구수'].iloc[i:i+2], color=color, linewidth=3)
 
-# 그래프 레이아웃 설정
 ax.set_title(f"[{selected_region}] 연령별 인구수 추이", fontsize=16, fontweight='bold', pad=15)
 ax.set_xlabel("나이 (세)", fontsize=12, labelpad=10)
 ax.set_ylabel("인구수 (명)", fontsize=12, labelpad=10)
 
-# 가로축 10살 단위로 구분선(Grid) 및 눈금 설정
 max_age = plot_df['나이'].max()
 ax.set_xticks(range(0, max_age + 1, 10))
 ax.grid(True, which='both', axis='x', linestyle='--', linewidth=1, color='gray', alpha=0.5)
-ax.grid(False, axis='y') # 깔끔한 뷰를 위해 가로 구분선만 강조
+ax.grid(False, axis='y')
 
-# 스트림릿 웹페이지에 렌더링
 st.pyplot(fig)
