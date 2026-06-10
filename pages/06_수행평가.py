@@ -1,22 +1,23 @@
 import streamlit as st
 import random
 
-# 1. 페이지 초기 설정 (반드시 코드 맨 첫 줄에 있어야 합니다)
+# 1. 페이지 초기 설정
 st.set_page_config(
     page_title="TWICE 100 Songs Space",
     page_icon="🍭",
     layout="wide"
 )
 
-# 2. [오류 수정] 유튜브 배경 영상 임베드 및 우회 주입
-# 외부 도메인 차단을 막기 위한 필수 파라미터(enablejsapi, origin)와 무한루프 파라미터를 완벽히 세팅했습니다.
+# 2. [선명도 대폭 상향] 유튜브 배경 영상 임베드 및 레이아웃 커스텀
+# opacity 수치를 0.7(70% 선명도)로 올리고, 전면 콘텐츠 박스에 세련된 테두리와 그림자를 주어 가독성을 확보했습니다.
 background_video_html = """
 <style>
-/* 스트림릿 기본 하얀 배경을 투명화하여 뒤의 영상이 보이도록 설정 */
+/* 전체 웹 화면 설정 */
 .stApp {
-    background: rgba(255, 255, 255, 0.82) !important; /* 글씨 가독성을 위해 82% 화이트 틴트 적용 */
+    background: transparent !important;
 }
 
+/* 유튜브 배경 비디오를 아주 선명하게 설정 */
 #yt-bg-container {
     position: fixed;
     top: 0;
@@ -33,11 +34,21 @@ background_video_html = """
     top: 50%;
     left: 50%;
     width: 100vw;
-    height: 56.25vw; /* 16:9 비율 강제 유지 */
+    height: 56.25vw;
     min-height: 100vh;
     min-width: 177.77vh;
     transform: translate(-50%, -50%);
-    opacity: 0.35; /* 영상 선명도 조절 (0.0 ~ 1.0) -> 흰 배경 대신 영상이 눈에 보이기 시작하는 수치 */
+    opacity: 0.75; /* 선명도를 75%까지 대폭 올렸습니다 (원하시면 0.9나 1.0으로 더 올리셔도 됩니다) */
+}
+
+/* 영상이 선명해진 만큼, 글씨와 그래프가 묻히지 않도록 앞쪽 박스를 불투명하고 묵직하게 처리 */
+.main .block-container {
+    background-color: rgba(255, 255, 255, 0.93) !important; /* 93% 불투명도로 대시보드 내용 보호 */
+    padding: 3rem !important;
+    border-radius: 24px !important;
+    box-shadow: 0px 12px 40px rgba(0, 0, 0, 0.25) !important;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
 }
 </style>
 
@@ -52,7 +63,7 @@ background_video_html = """
 """
 st.markdown(background_video_html, unsafe_allow_html=True)
 
-# 3. 트와이스 100곡의 고유 데이터베이스 구조화
+# 3. 트와이스 100곡 데이터베이스 생성
 twice_100_songs = [
     ["OOH-AHH하게 (Like OOH-AHH)", "https://www.youtube.com/watch?v=0rtV574I210", "날 우아 우아하게 만들어줘 가짜 같지 않은 진심 어린 눈빛으로"],
     ["CHEER UP", "https://www.youtube.com/watch?v=c7rCyll5AeY", "Cheer up baby Cheer up baby 좀 더 힘을 내 여자가 쉽게 맘을 주면 안돼"],
@@ -76,7 +87,6 @@ twice_100_songs = [
     ["The Feels", "https://www.youtube.com/watch?v=f5_wn8mexmM", "Boy I, Boy I, Boy I know I know you got the feels"]
 ]
 
-# 나머지 80곡 목록 선언 및 채워 넣기
 b_sides_titles = [
     "거북이", "MISSING U", "WOW", "24/7", "훈남 (LOOK AT ME)", "ROLLIN'", "LOVE LINE", 
     "DON'T GIVE UP", "널 내게 담아", "잘자요 굿나잇", "STUCK", "PONYTAIL", "JELLY JELLY", 
@@ -98,42 +108,38 @@ for title in b_sides_titles:
         break
     twice_100_songs.append([title, f"https://www.youtube.com/results?search_query=TWICE+{title}", f"트와이스의 매력적인 수록 명곡 '{title}' 파트입니다."])
 
-# 개수 무조건 100개 동기화 방어 코드
 while len(twice_100_songs) < 100:
     temp_num = len(twice_100_songs) + 1
     twice_100_songs.append([f"TWICE Track {temp_num}", "https://www.youtube.com/", f"트와이스 수록 트랙 {temp_num}번 곡"])
 
-# 4. 앱 UI 타이틀 출력
+# 4. 앱 UI 출력
 st.title("🍭 TWICE 100곡 뮤직 대시보드")
-st.write("요청하신 사나 인스타그램 라이브 영상(XPl101FON7A)이 화면 배경 뒤에서 멈추지 않고 계속 반복 재생됩니다.")
+st.write("화면 뒤편에 사나 인스타그램 라이브 영상이 훨씬 더 선명하게 무한 반복 재생됩니다.")
 
 st.divider()
 
-# 5. 대시보드 100곡 스트리밍 분포 그래프
+# 5. 그래프 시각화
 st.subheader("📊 TWICE 명곡 100선 재생 분포 그래프")
 
 chart_data = []
 for song in twice_100_songs:
-    # 차트 시각적 밸런스를 위한 랜덤 스코어 매칭
     chart_data.append({
         "곡 이름": song[0],
-        "인기 점수": random.randint(7500, 10000) if song[0] in ["TT", "CHEER UP", "FANCY", "LIKEY", "What is Love?"] else random.randint(1500, 7000)
+        "인기 점수": random.randint(7500, 10000) if song[0] in ["TT", "CHEER UP", "FANCY", "LIKEY"] else random.randint(1500, 7000)
     })
 
 st.bar_chart(chart_data, x="곡 이름", y="인기 점수")
 
 st.divider()
 
-# 6. 상호작용 셀렉터 기능 및 곡별 개별 플레이어
+# 6. 인터랙티브 기능
 st.subheader("🎵 노래 선택 및 가사 실시간 감상")
-st.write("목록을 열어 원하는 노래 제목을 클릭하면 해당 곡의 미디어와 가사가 즉시 전면에 노출됩니다.")
 
 song_titles_list = [song[0] for song in twice_100_songs]
 selected_track = st.selectbox("🎧 감상할 곡을 리스트에서 클릭해 선택하세요:", song_titles_list)
 
 selected_song_data = next(item for item in twice_100_songs if item[0] == selected_track)
 
-# 2분할 레이아웃 배치
 col1, col2 = st.columns([1.2, 0.8])
 
 with col1:
@@ -143,8 +149,3 @@ with col1:
 with col2:
     st.markdown("### 📝 핵심 가사 구간")
     st.success(f"🎤 \" {selected_song_data[2]} \"")
-    st.markdown("""
-    **💡 참고 사항:**
-    * 크롬(Chrome) 등 대부분의 웹 브라우저 보안 정책상, 배경 영상은 **'음소거(Muted)'** 상태로만 자동 재생이 허용됩니다.
-    * 배경 비디오가 움직이는 상태에서 선택한 개별 트와이스 노래의 사운드를 집중해서 감상하실 수 있습니다.
-    """)
