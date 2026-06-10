@@ -8,8 +8,8 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. [선명도 대폭 상향] 유튜브 배경 영상 임베드 및 레이아웃 커스텀
-# opacity 수치를 0.7(70% 선명도)로 올리고, 전면 콘텐츠 박스에 세련된 테두리와 그림자를 주어 가독성을 확보했습니다.
+# 2. [선명도 벨런스 조절] 유튜브 배경 영상 임베드 및 레이아웃 커스텀
+# opacity를 0.4로 지정하여 영상의 형체는 또렷이 보이되, 대시보드 글씨를 방해하지 않게 했습니다.
 background_video_html = """
 <style>
 /* 전체 웹 화면 설정 */
@@ -17,7 +17,7 @@ background_video_html = """
     background: transparent !important;
 }
 
-/* 유튜브 배경 비디오를 아주 선명하게 설정 */
+/* 유튜브 배경 비디오 설정 */
 #yt-bg-container {
     position: fixed;
     top: 0;
@@ -38,15 +38,15 @@ background_video_html = """
     min-height: 100vh;
     min-width: 177.77vh;
     transform: translate(-50%, -50%);
-    opacity: 0.75; /* 선명도를 75%까지 대폭 올렸습니다 (원하시면 0.9나 1.0으로 더 올리셔도 됩니다) */
+    opacity: 0.4; /* 딱 보기 좋은 40% 선명도로 조정했습니다! */
 }
 
-/* 영상이 선명해진 만큼, 글씨와 그래프가 묻히지 않도록 앞쪽 박스를 불투명하고 묵직하게 처리 */
+/* 전면 대시보드 박스 스타일 */
 .main .block-container {
-    background-color: rgba(255, 255, 255, 0.93) !important; /* 93% 불투명도로 대시보드 내용 보호 */
+    background-color: rgba(255, 255, 255, 0.88) !important; /* 배경 영상과 조화를 이루는 88% 불투명도 */
     padding: 3rem !important;
     border-radius: 24px !important;
-    box-shadow: 0px 12px 40px rgba(0, 0, 0, 0.25) !important;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15) !important;
     margin-top: 2rem;
     margin-bottom: 2rem;
 }
@@ -114,7 +114,7 @@ while len(twice_100_songs) < 100:
 
 # 4. 앱 UI 출력
 st.title("🍭 TWICE 100곡 뮤직 대시보드")
-st.write("화면 뒤편에 사나 인스타그램 라이브 영상이 훨씬 더 선명하게 무한 반복 재생됩니다.")
+st.write("요청하신 영상 선명도를 은은하고 또렷하게 최적화 완료했습니다.")
 
 st.divider()
 
