@@ -55,8 +55,8 @@ background_video_html = """
 """
 st.markdown(background_video_html, unsafe_allow_html=True)
 
-# 3. [에러 제로 검증] 신곡 THIS IS FOR + 외부 재생 허용 타이틀곡 라인업
-# 외부 도메인 차단 필터가 활성화되지 않는 가사 및 무대 전용 비디오 ID로 수동 세팅했습니다.
+# 3. [오류 트랙 제외] 신곡 THIS IS FOR + 에러 프리 대표곡 최종 라인업
+# 요청하신 대로 재생 에러를 일으키던 3곡을 완벽히 제거했습니다.
 twice_reliable_songs = [
     ["🔥 THIS IS FOR (최신 히트곡)", "xCWDoqQ0XDo", "This is for all my ladies who don't get hyped enough! 완벽한 조화"],
     ["🍭 CHEER UP", "c7rCyll5AeY", "Cheer up baby Cheer up baby 좀 더 힘을 내 여자가 쉽게 맘을 주면 안돼"],
@@ -70,16 +70,13 @@ twice_reliable_songs = [
     ["🍭 YES or YES", "mAKsZ26SabQ", "둘 중에 하나만 골라 YES or YES? 네 마음을 열어봐 YES or YES?"],
     ["🍭 FANCY", "kOHB85vDuow", "FANCY YOU 누가 먼저 좋아하면 어때 지금 너에게로 갈래"],
     ["🍭 Feel Special", "3ymwOvzhwHs", "그대가 있음에 내가 다시 웃어 원해 Everything's good 하니까"],
-    ["🍭 I CAN'T STOP ME", "CM4CkVFmT00", "알람이 울려대 Ring ring-a-ling 서로의 눈길이 닿을 때마다 알면서도 걸어가"],
     ["🍭 Alcohol-Free", "XA2YEHn-A8Q", "너는 눈으로 마시는 내 알코올 프리 모든 게 녹아내려 가 너 때문에"],
-    ["🍭 Talk that Talk", "k6jqx9kZgPM", "Talk that talk 딱 한 마디 Talk that talk L-O-V-E 들려줘"],
-    ["🍭 SET ME FREE", "a7Zp-e_6eY8", "I'm gonna tell you straight 이제는 무서울 게 없어 날 속박하던 모든 걸 벗어나"],
-    ["🍭 One in a Million", "8V-wN9X7m_Y", "One in a million 당신은 특별한 존재예요 이 세상에 단 하나뿐인"]
+    ["🍭 Talk that Talk", "k6jqx9kZgPM", "Talk that talk 딱 한 마디 Talk that talk L-O-V-E 들려줘"]
 ]
 
 # 4. 상단 대시보드 타이틀 출력
 st.title("🍭 TWICE 프리미엄 인라인 뮤직 룸")
-st.write("정규 4집 대신 신곡 'THIS IS FOR'를 반영하고, 재생 불가 오류 트랙을 원천 필터링한 사이트 내장형 버전입니다.")
+st.write("요청에 따라 일부 에러 발생 트랙을 완전히 제외한 최종 화면 내장 재생 버전입니다.")
 st.divider()
 
 # 5. 스트리밍 분포 시각화 그래프
@@ -95,7 +92,7 @@ for song in twice_reliable_songs:
 st.bar_chart(chart_data, x="곡 이름", y="인기 지수")
 st.divider()
 
-# 6. 상호작용 셀렉터 및 내부 인라인 웹 브라우저 플레이어
+# 6. 상호작용 셀렉터 및 내부 빌트인 비디오 플레이어
 st.subheader("🎵 노래 선택 및 대시보드 내 즉시 감상")
 
 song_titles_list = [song[0] for song in twice_reliable_songs]
@@ -103,13 +100,13 @@ selected_track = st.selectbox("🎧 감상할 곡을 아래 목록에서 클릭�
 
 selected_song_data = next(item for item in twice_reliable_songs if item[0] == selected_track)
 
-# 화면 분할 배치 (동영상 가로 넓이 최적화 레이아웃)
+# 화면 분할 배치 (플레이어 최적화 레이아웃)
 col1, col2 = st.columns([1.3, 0.7])
 
 with col1:
     st.markdown(f"### 📺 사이트 내부 인라인 비디오: **{selected_song_data[0]}**")
     
-    # 🛠️ [화면 안뜨는 오류 완전 해결] 유튜브 임베드 표준 샌드박싱 구조 주입
+    # 임베드 표준 컨테이너 구조 적용
     inline_player_html = f"""
     <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
         <iframe 
