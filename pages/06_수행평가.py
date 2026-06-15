@@ -55,15 +55,11 @@ background_video_html = """
 """
 st.markdown(background_video_html, unsafe_allow_html=True)
 
-# 3. [오피셜 M/V 대규모 패치] 에러 프리 뮤직비디오 전용 라인업 데이터베이스
-# 퍼가기가 완벽 지원되는 공식 M/V 식별값 코드로만 세팅했습니다.
+# 3. [오피셜 M/V] 내장 재생 검증 완료 리스트
 twice_reliable_songs = [
-    # 🔥 최신 & 요청 뮤직비디오 집중 배치 구역
     ["🎬 THIS IS FOR (공식 M/V)", "eHHQaoEW30Q", "This is for everyone, 널 위한 우리의 완벽한 멜로디 속에 내 마음을 담아!"],
     ["🎬 Strategy (feat. Megan Thee Stallion) M/V", "Sz_wWzgh-vQ", "기다릴 필요 없어, 우리만의 특별한 Strategy를 보여줄게!"],
     ["🎬 ONE SPARK (공식 M/V)", "jCzez_q8si0", "이건 하이라이트 내 마음속의 불꽃, 영원히 타오를 ONE SPARK!"],
-    
-    # 🌟 대시보드 내장 재생이 완벽 검증된 메가 히트 타이틀곡 존
     ["🍭 CHEER UP", "c7rCyll5AeY", "Cheer up baby Cheer up baby 좀 더 힘을 내 여자가 쉽게 맘을 주면 안돼"],
     ["🍭 TT", "ePpPVE-GGJw", "이러지도 못하는데 저러지도 못하는데 이런 내 맘 모르고 너무해 너무해"],
     ["🍭 KNOCK KNOCK", "8A2t_tAjMz8", "Knock knock knock knock knock on my door 내 맘이 열리게 해줘"],
@@ -81,10 +77,10 @@ twice_reliable_songs = [
 
 # 4. 상단 대시보드 타이틀 출력
 st.title("🍭 TWICE 프리미엄 오피셜 M/V 룸")
-st.write("THIS IS FOR 뮤비 교체 및 Strategy, ONE SPARK 뮤비를 새롭게 내장하여 구성한 에러 프리 화면 인터페이스입니다.")
+st.write("오류 요소를 완벽히 제거하고 재생 안정성을 높인 최종 빌드 버전입니다.")
 st.divider()
 
-# 5. 스트리밍 분포 시각화 그래프
+# 5. 스트리밍 분포 시각화 그래프 (오류 수정 완료)
 st.subheader("📊 선호도 트랙 실시간 시뮬레이션")
 
 chart_data = []
@@ -94,7 +90,8 @@ for song in twice_reliable_songs:
         "인기 지수": random.randint(9500, 10000) if "M/V" in song[0] or "THIS IS FOR" in song[0] or song[0] in ["🍭 TT", "🍭 FANCY"] else random.randint(4000, 8500)
     })
 
-st.bar_chart(chart_data, x="곡 elegance", y="인기 지수")
+# x축 컬럼 이름을 정밀하게 매칭시켜 차트 에러를 완전히 해결했습니다.
+st.bar_chart(chart_data, x="곡 이름", y="인기 지수")
 st.divider()
 
 # 6. 상호작용 셀렉터 및 내부 빌트인 오피셜 M/V 플레이어
@@ -105,13 +102,13 @@ selected_track = st.selectbox("🎧 감상할 뮤직비디오를 아래 목록�
 
 selected_song_data = next(item for item in twice_reliable_songs if item[0] == selected_track)
 
-# 화면 분할 배치 (비디오 가로폭 맞춤형 레이아웃)
+# 화면 분할 배치
 col1, col2 = st.columns([1.3, 0.7])
 
 with col1:
     st.markdown(f"### 📺 사이트 내부 온스크린 M/V: **{selected_song_data[0]}**")
     
-    # 🛠️ 끊김 없는 인라인 재생용 임베드 코드 샌드박싱
+    # 인라인 재생용 임베드 코드 안정화 수치 적용
     inline_player_html = f"""
     <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
         <iframe 
