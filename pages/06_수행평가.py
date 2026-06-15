@@ -55,17 +55,20 @@ background_video_html = """
 """
 st.markdown(background_video_html, unsafe_allow_html=True)
 
-# 3. 트와이스 명곡 플레이리스트 데이터베이스 (요청 반영 최종 라인업)
+# 3. 트와이스 명곡 플레이리스트 데이터베이스 (새 트랙 누적 반영 완료)
 twice_reliable_songs = [
-    # 🔥 최신 & 수록 수정 완료 트랙 존
+    # 🔥 새로 추가된 고음질 오디오/영상 수록곡 라인업
+    ["🎵 거북이 (TURTLE)", "tVv_C2fYStU", "거북이처럼 느려도 좋아, 한 걸음씩 내게 다가와 줄래"],
+    ["🎵 선인장 (CACTUS)", "OTHG8RqPSKE", "차가운 바람이 불어와도 난 너를 기다려, 내 맘을 알아줘"],
+    ["🎵 SAY YOU LOVE ME", "x2cUrOnaCDg", "망설이지 말고 내게 말해줘, Say you love me 원하고 있잖아"],
+    ["🎵 Mars", "PdXhWsBRCl4", "우주 너머 화성까지 닿을 것 같은 우리둘만의 신비로운 시그널"],
+    ["🎵 Candy", "AMRCx2kjv2A", "사탕보다 달콤한 너의 목소리, 자꾸만 내 귓가에 사르르 맴돌아"],
+    
+    # 🎬 내장 재생 검증 완료 타이틀곡 & M/V 라인업
     ["🎬 THIS IS FOR (공식 M/V)", "eHHQaoEW30Q", "This is for everyone, 널 위한 우리의 완벽한 멜로디 속에 내 마음을 담아!"],
     ["🎬 Strategy (feat. Megan Thee Stallion) M/V", "Sz_wWzgh-vQ", "기다릴 필요 없어, 우리만의 특별한 Strategy를 보여줄게!"],
     ["🎬 ONE SPARK (공식 M/V)", "jCzez_q8si0", "이건 하이라이트 내 마음속의 불꽃, 영원히 타오를 ONE SPARK!"],
     ["🎬 SCIENTIST (공식 M/V)", "vPwaXytZcgI", "왜 자꾸 날 연구해 아인슈타인도 아니고 각 재지 말고 맘이 가는 대로 해!"],
-    ["🎵 Mars", "PdXhWsBRCl4", "우주 너머 화성까지 닿을 것 같은 우리둘만의 신비로운 시그널"],
-    ["🎵 Candy", "AMRCx2kjv2A", "사탕보다 달콤한 너의 목소리, 자꾸만 내 귓가에 사르르 맴돌아"],
-    
-    # 🌟 내장 재생 검증 완료 타이틀곡 라인업
     ["🍭 CHEER UP", "c7rCyll5AeY", "Cheer up baby Cheer up baby 좀 더 힘을 내 여자가 쉽게 맘을 주면 안돼"],
     ["🍭 TT", "ePpPVE-GGJw", "이러지도 못하는데 저러지도 못하는데 이런 내 맘 모르고 너무해 너무해"],
     ["🍭 KNOCK KNOCK", "8A2t_tAjMz8", "Knock knock knock knock knock on my door 내 맘이 열리게 해줘"],
@@ -83,7 +86,7 @@ twice_reliable_songs = [
 
 # 4. 상단 대시보드 타이틀 출력
 st.title("🍭 TWICE 프리미엄 인라인 뮤직 룸")
-st.write("제목 오류 수정(SCIENTIST 적용) 및 오디오 재생이 검증된 Mars, Candy가 정상 분리 누적된 최종 인터페이스입니다.")
+st.write("요청하신 거북이, 선인장, SAY YOU LOVE ME 트랙이 온스크린 플레이어에 완벽히 추가된 릴리즈 빌드입니다.")
 st.divider()
 
 # 5. 스트리밍 분포 시각화 그래프
@@ -113,7 +116,7 @@ col1, col2 = st.columns([1.3, 0.7])
 with col1:
     st.markdown(f"### 📺 사이트 내부 온스크린 재생: **{selected_song_data[0]}**")
     
-    # 인라인 재생용 임베드 프레임 (모든 장치 및 스트림릿 도메인 우회 대응)
+    # 인라인 재생용 임베드 프레임
     inline_player_html = f"""
     <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
         <iframe 
